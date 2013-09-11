@@ -91,32 +91,23 @@ def depthFirstSearch(problem):
     "*** YOUR CODE HERE ***"
     coordinates = 0
     action = 1
-    visited = set(problem.getStartState())
+    visited = set()
     frontier = util.Stack()
-    actions = [] 
-    
-    for sucessors in problem.getSuccessors(problem.getStartState()):
-        frontier.push(sucessors)
-  
+    currentState = ((problem.getStartState(), [], 0))
+    frontier.push(currentState)
+
     while frontier.isEmpty() == False:
         currentState = frontier.pop()
             
-        if currentState[coordinates] in visited:
+        if problem.isGoalState(currentState[coordinates]):
+           return currentState[action]
+        elif currentState[coordinates] in visited:
            continue
 
-        visited.add(currentState[coordinates])
-        actions.append(currentState[action])
-        
         for next in problem.getSuccessors(currentState[coordinates]):
-           if next[coordinates] not in visited: 
-                #print "CurrentNode:", next[coordinates]
-                #print "Is the node a goal?", problem.isGoalState(next[coordinates])
-                #print "node's successors:", problem.getSuccessors(next[coordinates]), "\n"
-                if problem.isGoalState(next[coordinates]):
-                    actions.append(next[action])
-                    return actions
-                frontier.push(next)
-     
+           frontier.push((next[coordinates], currentState[action] + [next[action]], next[2]))
+           visited.add(currentState[coordinates])
+
     util.raiseNotDefined()
         
 def breadthFirstSearch(problem):
@@ -124,6 +115,25 @@ def breadthFirstSearch(problem):
     Search the shallowest nodes in the search tree first.
     """
     "*** YOUR CODE HERE ***"
+    coordinates = 0
+    action = 1
+    visited = set()
+    frontier = util.Queue()
+    currentState = ((problem.getStartState(), [], 0))
+    frontier.push(currentState)
+
+    while frontier.isEmpty() == False:
+        currentState = frontier.pop()
+            
+        if problem.isGoalState(currentState[coordinates]):
+            return currentState[action]
+        elif currentState[coordinates] in visited:
+           continue
+
+        for next in problem.getSuccessors(currentState[coordinates]):
+           frontier.push((next[coordinates], currentState[action] + [next[action]], next[2]))
+           visited.add(currentState[coordinates])
+           
     util.raiseNotDefined()
     
 def uniformCostSearch(problem):
