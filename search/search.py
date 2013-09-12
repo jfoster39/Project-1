@@ -109,7 +109,7 @@ def depthFirstSearch(problem):
         # to that node. 
         for successor in problem.getSuccessors(currentState[coordinates]):
            frontier.push((successor[coordinates], currentState[actions] + 
-                [successor[actions]], successor[2]))
+                [successor[actions]]))
 
         visited.add(currentState[coordinates])
     util.raiseNotDefined()
@@ -136,7 +136,7 @@ def breadthFirstSearch(problem):
 
         for successor in problem.getSuccessors(currentState[coordinates]):
            frontier.push((successor[coordinates], currentState[actions] + 
-                [successor[actions]], successor[2]))
+                [successor[actions]]))
 
         visited.add(currentState[coordinates])
     util.raiseNotDefined()
@@ -144,6 +144,31 @@ def breadthFirstSearch(problem):
 def uniformCostSearch(problem):
     "Search the node of least total cost first. "
     "*** YOUR CODE HERE ***"
+    coordinates = 0
+    actions = 1
+    pathCosts = 2
+    visited = set()
+    frontier = util.PriorityQueueWithFunction(lambda x: x[pathCosts])
+    currentState = ((problem.getStartState(), [], 0))
+    frontier.push(currentState)
+
+    while frontier.isEmpty() == False:
+        currentState = frontier.pop()
+            
+        if problem.isGoalState(currentState[coordinates]):
+           return currentState[actions]
+        elif currentState[coordinates] in visited:
+           continue
+
+        # Here we have the same as before but this time, we have to 
+        # add to the successor's path cost to our current value for the 
+        # path's up to this point
+        for successor in problem.getSuccessors(currentState[coordinates]):
+           frontier.push((successor[coordinates], 
+            currentState[actions] + [successor[actions]], 
+                currentState[pathCosts] + successor[pathCosts]))
+
+        visited.add(currentState[coordinates])
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
