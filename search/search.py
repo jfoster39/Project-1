@@ -90,7 +90,7 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
     coordinates = 0
-    action = 1
+    actions = 1
     visited = set()
     frontier = util.Stack()
     currentState = ((problem.getStartState(), [], 0))
@@ -100,14 +100,18 @@ def depthFirstSearch(problem):
         currentState = frontier.pop()
             
         if problem.isGoalState(currentState[coordinates]):
-           return currentState[action]
+           return currentState[actions]
         elif currentState[coordinates] in visited:
            continue
 
-        for next in problem.getSuccessors(currentState[coordinates]):
-           frontier.push((next[coordinates], currentState[action] + [next[action]], next[2]))
-           visited.add(currentState[coordinates])
+        # Here we have to add the successors to the frontier, and also 
+        # add the next action to all of our previous actions attributed 
+        # to that node. 
+        for successor in problem.getSuccessors(currentState[coordinates]):
+           frontier.push((successor[coordinates], currentState[actions] + 
+                [successor[actions]], successor[2]))
 
+        visited.add(currentState[coordinates])
     util.raiseNotDefined()
         
 def breadthFirstSearch(problem):
@@ -116,7 +120,7 @@ def breadthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
     coordinates = 0
-    action = 1
+    actions = 1
     visited = set()
     frontier = util.Queue()
     currentState = ((problem.getStartState(), [], 0))
@@ -126,14 +130,15 @@ def breadthFirstSearch(problem):
         currentState = frontier.pop()
             
         if problem.isGoalState(currentState[coordinates]):
-            return currentState[action]
+           return currentState[actions]
         elif currentState[coordinates] in visited:
            continue
 
-        for next in problem.getSuccessors(currentState[coordinates]):
-           frontier.push((next[coordinates], currentState[action] + [next[action]], next[2]))
-           visited.add(currentState[coordinates])
-           
+        for successor in problem.getSuccessors(currentState[coordinates]):
+           frontier.push((successor[coordinates], currentState[actions] + 
+                [successor[actions]], successor[2]))
+
+        visited.add(currentState[coordinates])
     util.raiseNotDefined()
     
 def uniformCostSearch(problem):
