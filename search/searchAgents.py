@@ -300,7 +300,7 @@ class CornersProblem(search.SearchProblem):
         "Returns whether this search state is a goal state of the problem"
         
         "*** YOUR CODE HERE ***"
-        # Checks whether or not there is food left to find
+        # Checks whether or not there are corners left to travel to
         if (len(state[1]) == 0):
             isGoal = True
         else:
@@ -336,17 +336,17 @@ class CornersProblem(search.SearchProblem):
             nextx, nexty = int(x + dx), int(y + dy)
             hitsWall = self.walls[nextx][nexty]
             cornersNotVisited = state[1]
-            nextFood = []
+            nextCorner = []
 
             # After calculating the nextCoordinates, we check that the action is 
             # a legal move. If is is, then we see if our currentPosition is a 
-            # food block. If it is then we remove it from the nextState. 
+            # corner block. If it is then we remove it from the nextState. 
             if not hitsWall:
                 nextState = (nextx, nexty)
                 if nextState in cornersNotVisited:
-                    nextFood = list(cornersNotVisited)
-                    nextFood.remove(nextState)
-                    successors.append( ((nextState, tuple(nextFood)), action, 1) )
+                    nextCorner = list(cornersNotVisited)
+                    nextCorner.remove(nextState)
+                    successors.append( ((nextState, tuple(nextCorner)), action, 1) )
                 else:
                     successors.append( ((nextState, cornersNotVisited), action, 1) )
             
@@ -384,7 +384,44 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    # Algorithm outline:
+    # First we calculate the closest corner to pacman that hasnt already been
+    # visited. After we get that value, we then find the closest corner to 
+    # that one, and then the closest to that value for the duration of the list 
+    currentCoordinates = state[0]
+    cornerStates = state[1]
+    distance = 0.0
+
+    if (len(cornerStates) == 0):
+        return distance
+
+    # calculate the closest corner to pacman, using manhatten distances
+    minDistanceCorner = cornerStates[0]
+    minDistanceToCorner = abs(currentCoordinates[0] - minDistanceCorner[0]) + abs(currentCoordinates[1] - minDistanceCorner[1])
+    for corner in cornerStates:
+        nextCornerCoordinates = corner
+        tempDistance = abs(currentCoordinates[0] - nextCornerCoordinates[0]) + abs(currentCoordinates[1] - nextCornerCoordinates[1])
+        if (tempDistance < minDistanceToCorner):
+            minDistanceToCorner = tempDistance
+            minDistanceCorner = nextCornerCoordinates
+    cornersToTravel = list(cornerStates)
+    cornersToTravel.remove(minDistanceCorner)
+
+    # Here is the second part, we have to calculate what corner is closest 
+    # to our minDistanceCorner's in the cornersToTravel list
+    while len(cornersToTravel) > 0:
+        distance = 999999
+        cornerList = []
+        for corner in cornersToTravel:
+            tempDistance = abs(corner[0] - minDistanceCorner[0]) + abs(corner[1] - minDistanceCorner[1])
+            if (tempDistance < distance):
+                distance = tempDistance
+                cornerList = corner
+        minDistanceToCorner += distance
+        minDistanceCorner = cornerList
+        cornersToTravel.remove(cornerList)
+
+    return minDistanceToCorner
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
