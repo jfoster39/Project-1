@@ -284,16 +284,29 @@ class CornersProblem(search.SearchProblem):
         self._expanded = 0 # Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
+
         "*** YOUR CODE HERE ***"
+        self._visited = {} 
+        self._visitedlist = [] 
+        self.startState = (self.startingPosition, self.corners)
 
     def getStartState(self):
         "Returns the start state (in your state space, not the full Pacman state space)"
+        
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.startState
 
     def isGoalState(self, state):
         "Returns whether this search state is a goal state of the problem"
+        
         "*** YOUR CODE HERE ***"
+        # Checks whether or not there is food left to find
+        if (len(state[1]) == 0):
+            isGoal = True
+        else:
+            isGoal = False
+        return isGoal
+
         util.raiseNotDefined()
 
     def getSuccessors(self, state):
@@ -318,7 +331,25 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            x,y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            cornersNotVisited = state[1]
+            nextFood = []
 
+            # After calculating the nextCoordinates, we check that the action is 
+            # a legal move. If is is, then we see if our currentPosition is a 
+            # food block. If it is then we remove it from the nextState. 
+            if not hitsWall:
+                nextState = (nextx, nexty)
+                if nextState in cornersNotVisited:
+                    nextFood = list(cornersNotVisited)
+                    nextFood.remove(nextState)
+                    successors.append( ((nextState, tuple(nextFood)), action, 1) )
+                else:
+                    successors.append( ((nextState, cornersNotVisited), action, 1) )
+            
         self._expanded += 1
         return successors
 
